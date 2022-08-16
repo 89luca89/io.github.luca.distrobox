@@ -1,0 +1,5 @@
+#!/bin/sh
+
+cp /app/bin/distrobox* "${XDG_DATA_HOME}"
+# shellcheck disable=SC2068
+host-spawn "${XDG_DATA_HOME}"/distrobox $@
