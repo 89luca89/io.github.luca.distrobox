@@ -33,6 +33,15 @@ flatpak install --user -y dist/io.github.luca.distrobox.flatpak
 This flatpak does not really support sandboxing, as the target of distrobox is
 tight integration with the host.
 
+# Usage
+
+`flatpak run io.github.luca.distrobox`
+
+And use it as you normally would use distrobox.
+It is handy to put an alias in your shell to shorten the command: `alias distrobox="flatpak run io.github.luca.distrobox"` 
+
+Usage is the same as the normal app, just the command name changes from `distrobox` to  `flatpak run io.github.luca.distrobox` 
+
 # Credits
 
 This work is originated on the manifest of [@axtloss](https://github.com/axtloss) in [axtloss/flatpaks](https://github.com/axtloss/flatpaks) and
