@@ -52,8 +52,8 @@ modules:
     buildsystem: simple
     sources:
       - type: archive
-        url: https://github.com/89luca89/distrobox/archive/20336f643609d3347388ab6b200ae4a87e787311.tar.gz
-        sha256: bbc194afc62dc56d706b23a9836483662d08da34a827394c58450814e7226e31
+        url: https://github.com/89luca89/distrobox/archive/ea26665923ae9a3fa6a6b512c43044e550ce9796.tar.gz
+        sha256: 3ece2f5a5ecb6d2ed143ee687fb6ad055fb1184446a0b05120da535655b06f78
         dest: distrobox
       - type: file
         path: wrapper
