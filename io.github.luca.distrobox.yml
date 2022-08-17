@@ -8,55 +8,26 @@ runtime-version: '21.08'
 sdk: org.freedesktop.Sdk
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.golang
-command: wrapper
+command: distrobox
 finish-args:
+  - --share=ipc
+  - --share=network
+  - --socket=fallback-x11 # not sure why, but gui applications only work when both x11 and fallback-x11 are allowed
+  - --socket=wayland
+  - --socket=x11
   - --talk-name=org.freedesktop.Flatpak # required for host-spawn/flatpak-spawn
 modules:
-  - name: host-spawn
-    buildsystem: simple
-    sources:
-      - type: archive
-        url: https://github.com/1player/host-spawn/archive/refs/tags/1.2.1.tar.gz
-        sha256: dd4302e56f395d79cc081314951f1e49aca83daac200befa33cb43eb63b467af
-      - type: archive
-        url: https://github.com/godbus/dbus/archive/refs/tags/v5.1.0.tar.gz
-        sha256: 2f4939ab13a20178584ef534293abc5b6744bb5b6232432050c5a3ab2ab85fd7
-        dest: vendor/github.com/godbus/dbus/v5
-      - type: archive
-        url: https://github.com/pkg/term/archive/refs/tags/v1.1.0.tar.gz
-        sha256: dc7e94b88b5d494264d28923a58a73732ed066897a916ab36568fac2b32a91d5
-        dest: vendor/github.com/pkg/term/
-      - type: git
-        url: https://go.googlesource.com/sys
-        commit: 1c4a2a72c664c42691e45fe3a31510ec5ba13cfb
-        dest: vendor/golang.org/x/sys
-    build-commands:
-      - |
-        echo "# github.com/godbus/dbus/v5 v5.1.0
-        ## explicit; go 1.12
-        github.com/godbus/dbus/v5
-        # github.com/pkg/term v1.1.0
-        ## explicit; go 1.14
-        github.com/pkg/term/termios
-        # golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1
-        ## explicit; go 1.17
-        golang.org/x/sys/internal/unsafeheader
-        golang.org/x/sys/unix"> vendor/modules.txt
-      - |
-        . /usr/lib/sdk/golang/enable.sh
-        export GOPATH=$PWD/go
-        CGO_ENABLED=0 GOARCH=amd64 go build -ldflags '-X main.Version=1.2.1' -o build/host-spawn
-      - install -Dm755 -t /app/bin build/host-spawn
-      - strip /app/bin/host-spawn
   - name: distrobox
     buildsystem: simple
     sources:
-      - type: archive
-        url: https://github.com/89luca89/distrobox/archive/ea26665923ae9a3fa6a6b512c43044e550ce9796.tar.gz
-        sha256: 3ece2f5a5ecb6d2ed143ee687fb6ad055fb1184446a0b05120da535655b06f78
-        dest: distrobox
+      - type: git
+        url: https://github.com/89luca89/distrobox.git
+        branch: experiment/flatpak
       - type: file
-        path: wrapper
+        path: podman
+      - type: file
+        path: docker
     build-commands:
-      - cd distrobox && ./install --prefix /app
-      - cp ./wrapper /app/bin
+      - ./install --prefix /app
+      - cp ./podman /app/bin
+      - cp ./docker /app/bin
