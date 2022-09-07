@@ -7,56 +7,25 @@ runtime: org.freedesktop.Platform
 runtime-version: '21.08'
 sdk: org.freedesktop.Sdk
 sdk-extensions:
-  - org.freedesktop.Sdk.Extension.golang
 command: wrapper
 finish-args:
   - --talk-name=org.freedesktop.Flatpak # required for host-spawn/flatpak-spawn
 modules:
-  - name: host-spawn
-    buildsystem: simple
-    sources:
-      - type: archive
-        url: https://github.com/1player/host-spawn/archive/refs/tags/1.2.1.tar.gz
-        sha256: dd4302e56f395d79cc081314951f1e49aca83daac200befa33cb43eb63b467af
-      - type: archive
-        url: https://github.com/godbus/dbus/archive/refs/tags/v5.1.0.tar.gz
-        sha256: 2f4939ab13a20178584ef534293abc5b6744bb5b6232432050c5a3ab2ab85fd7
-        dest: vendor/github.com/godbus/dbus/v5
-      - type: archive
-        url: https://github.com/pkg/term/archive/refs/tags/v1.1.0.tar.gz
-        sha256: dc7e94b88b5d494264d28923a58a73732ed066897a916ab36568fac2b32a91d5
-        dest: vendor/github.com/pkg/term/
-      - type: git
-        url: https://go.googlesource.com/sys
-        commit: 1c4a2a72c664c42691e45fe3a31510ec5ba13cfb
-        dest: vendor/golang.org/x/sys
-    build-commands:
-      - |
-        echo "# github.com/godbus/dbus/v5 v5.1.0
-        ## explicit; go 1.12
-        github.com/godbus/dbus/v5
-        # github.com/pkg/term v1.1.0
-        ## explicit; go 1.14
-        github.com/pkg/term/termios
-        # golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1
-        ## explicit; go 1.17
-        golang.org/x/sys/internal/unsafeheader
-        golang.org/x/sys/unix"> vendor/modules.txt
-      - |
-        . /usr/lib/sdk/golang/enable.sh
-        export GOPATH=$PWD/go
-        CGO_ENABLED=0 GOARCH=amd64 go build -ldflags '-X main.Version=1.2.1' -o build/host-spawn
-      - install -Dm755 -t /app/bin build/host-spawn
-      - strip /app/bin/host-spawn
   - name: distrobox
     buildsystem: simple
     sources:
       - type: archive
-        url: https://github.com/89luca89/distrobox/archive/ea26665923ae9a3fa6a6b512c43044e550ce9796.tar.gz
-        sha256: 3ece2f5a5ecb6d2ed143ee687fb6ad055fb1184446a0b05120da535655b06f78
+        url: https://github.com/89luca89/distrobox/archive/21a0e01798604c84a0627d1d973389b03f0729d5.tar.gz
+        sha256: af49a2dd2419de20a2cc8b42d9defc9eb8dd0805a3df400b5eed6bec65eac2f7
         dest: distrobox
+      - type: file
+        url: https://github.com/1player/host-spawn/releases/download/1.2.1/host-spawn-x86_64
+        sha256: 49c7c1902030f7a027c94791399fe9951f3675d1c81be9c987a9f975c570255e
       - type: file
         path: wrapper
     build-commands:
       - cd distrobox && ./install --prefix /app
       - cp ./wrapper /app/bin
+      - cp ./host-spawn-x86_64 /app/bin/host-spawn
+      - strip /app/bin/host-spawn
+      - chmod +x /app/bin/*
