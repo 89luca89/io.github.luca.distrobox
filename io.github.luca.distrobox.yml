@@ -1,31 +1,63 @@
-# This manifest file is based upon the work of @axtloss in https://github.com/axtloss/flatpaks
-# host-spawn build module has been inspired by the work of @mirkobrombin in https://github.com/AtomsDevs/Atoms/
-# Credits to their work for inspiring this one.
----
 app-id: io.github.luca.distrobox
 runtime: org.freedesktop.Platform
 runtime-version: '21.08'
 sdk: org.freedesktop.Sdk
 sdk-extensions:
-command: wrapper
+  - org.freedesktop.Sdk.Extension.golang
 finish-args:
-  - --talk-name=org.freedesktop.Flatpak # required for host-spawn/flatpak-spawn
+  - --talk-name=org.freedesktop.Flatpak
+command: wrapper
+
 modules:
+  - name: host-spawn
+    buildsystem: simple
+    sources:
+      - type: archive
+        url: https://github.com/1player/host-spawn/archive/refs/tags/1.3.0.zip
+        sha256: 630d7e44f63fe2bc98200c6941cf37cc3872a51798287037de063e72db0ccce6
+        dest: host-spawn
+        x-checker-data:
+          type: anitya
+          project-id: 270202
+          stable-only: true
+          url-template: https://github.com/1player/host-spawn/archive/refs/tags/$version.zip
+    build-options:
+      append-path: /usr/lib/sdk/golang/bin
+      env:
+        GOBIN: /app/bin
+        GO111MODULE: off
+        GOPATH: /run/build/writeas
+        CGO_ENABLED: 0
+      build-args:
+        - --share=network
+    build-commands:
+      - cd host-spawn && go install
+      - cd host-spawn && go build -o /app/bin/host-spawn
+      - chmod +x /app/bin/host-spawn
   - name: distrobox
     buildsystem: simple
     sources:
       - type: archive
-        url: https://github.com/89luca89/distrobox/archive/21a0e01798604c84a0627d1d973389b03f0729d5.tar.gz
-        sha256: af49a2dd2419de20a2cc8b42d9defc9eb8dd0805a3df400b5eed6bec65eac2f7
+        url: https://github.com/89luca89/distrobox/archive/refs/tags/1.4.1.tar.gz
+        sha256: be3266f77011b30da5d0035e246d4e4a9360b7c90fbd8b90ac581165a00217b8
         dest: distrobox
-      - type: file
-        url: https://github.com/1player/host-spawn/releases/download/1.2.1/host-spawn-x86_64
-        sha256: 49c7c1902030f7a027c94791399fe9951f3675d1c81be9c987a9f975c570255e
+        x-checker-data:
+          type: anitya
+          project-id: 242098
+          stable-only: true
+          url-template: https://github.com/89luca89/distrobox/archive/refs/tags/$version.zip
+    build-commands:
+      - cd distrobox && ./install --prefix /app
+  # - name: shims
+  #   buildsystem: simple
+  #   build-commands:
+  #     - ln -s /app/bin/host-spawn /app/bin/podman
+  #     - ln -s /app/bin/host-spawn /app/bin/docker
+  - name: distrobox-wrapper
+    buildsystem: simple
+    sources:
       - type: file
         path: wrapper
     build-commands:
-      - cd distrobox && ./install --prefix /app
-      - cp ./wrapper /app/bin
-      - cp ./host-spawn-x86_64 /app/bin/host-spawn
-      - strip /app/bin/host-spawn
-      - chmod +x /app/bin/*
+      - install -Dm755 ./wrapper /app/bin
+
