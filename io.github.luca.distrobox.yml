@@ -1,3 +1,7 @@
+# This manifest file was based upon the work of @axtloss in https://github.com/axtloss/flatpaks
+# host-spawn build module has been inspired by the work of @mirkobrombin in https://github.com/AtomsDevs/Atoms/
+# Credits to their work for inspiring this one.
+---
 app-id: io.github.luca.distrobox
 runtime: org.freedesktop.Platform
 runtime-version: '21.08'
